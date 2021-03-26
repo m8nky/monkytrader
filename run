@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+
+laddertrade=0
+[[ "$1" = "initdb" ]] && laddertrade=1
+docker build -t monkytrader .
+if [[ $laddertrade -eq 1 ]]; then
+    docker run -ti --rm --link redis monkytrader python -m msapp.ladderconf
+else
+    docker run -d --name="monkytrader" --env-file env.list --link redis -p 9501:9501 monkytrader
+fi

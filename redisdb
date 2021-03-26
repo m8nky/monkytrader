@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+docker stop redis
+docker rm redis
+docker run -d --name="redis" -v redis-monkytrader:/data redis redis-server --appendonly yes

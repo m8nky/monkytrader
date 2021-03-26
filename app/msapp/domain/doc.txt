@@ -1,0 +1,78 @@
+=== Model
+
+Strategy Volume
+
+
+   Ladder
+    -id
+
+Low    High
+-BL   -SL
+
+
+Positions
+ [
+  -ladderId
+  -volume USDT
+  -volume BTC
+  -accumulatedFees
+  -activeOrders[
+   -orderId
+  ]         # Needed for tracing the position
+ ]
+
+
+Ticker
+-symbol
+-current market price
+
+
+
+Initial start:
+5 ladders: 6k, 6.1k, 6.2k, 6.3k, 6.4k
+              B   B  S  B  S  B  S    S
+4 positions: 100 USDT each
+CMP: 6.35k
+!! Set BL orders below CMP: 6k, 6.1k, 6.2k, 6.3k
+
+T1: 6.3k - BL 0.1BTC -> Set SL 6.4k
+T2: 6.2k - BL 0.1BTC -> Set SL 6.3k
+T3: 6.3k - SL 0.1BTC -> Set BL 6.2k
+
+Result: 4x BL, 1x SL
+
+
+Bootstrap:
+S1:
+CMP: 6.35k
+List open orders: 4x BL, 1x SL
+!! do nothing
+
+S2:
+CMP: 6.15k
+List open orders: 2x BL, 1x SL (2x filled BL)
+!! Update SL orders above CMP: 2x SL
+
+S3:
+CMP: 7k
+List open orders: 3x BL (1x filled SL)
+!! Update BL orders below CMP: 1x BL
+
+S4:
+CMP: 7k
+List open orders: 2x BL (1x filled SL) # missed one sell trade
+!! Update BL orders below CMP: 1x Smarket (confirm), 2x BL
+
+S5:
+CMP: 6.15k
+List open orders: 2x BL
+!! do nothing
+
+S6:
+CMP: 5.9k
+List open orders: 1x SL
+!! Update SL orders above CMP: 3x Bmarket (confirm), 3x SL
+
+
+2. Test number of BL below CMP, otherwise set missing BL
+3. Test number of SL above CMP, otherwise set missing SL

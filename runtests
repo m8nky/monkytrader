@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+TESTENV="$1"
+if [[ "${TESTENV}" != "" ]]; then
+    TESTENV="-a ${TESTENV}"
+fi
+docker build -t monkytrader . && docker run -ti --rm --env-file env.list --link redis monkytrader python -m nose msapp.test ${TESTENV} -s
